@@ -1,66 +1,106 @@
 <template>
-  <div class="container">
-    <div>
-      <h1 class="title">
-        advent-calendar-2019-tailwind
-      </h1>
-      <h2 class="subtitle">
-        My incredible Nuxt.js project
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
+  <div class="container p-6">
+    <h1 class="text-3xl mb-2">
+      Nuxt.js Advent Calendar 2019
+    </h1>
+
+    <p class="mb-2">{{ comment }}</p>
+
+    <table class="table-auto w-full">
+      <thead>
+        <tr class="flex">
+          <th class="border px-4 py-2 day"
+            v-for="dayName in dayNames"
+            :key="dayName"
+          >
+            {{ dayName }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="flex"
+          v-for="index in [0, 1, 2]"
+          :key="index"
         >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
+          <td class="border px-4 py-2 day"
+            v-for="day in days.slice((7 * index), (7 + (7 * index)))"
+            :key="day.date"
+          >
+            <p class="bg-blue-100 text-blue-700 px-2 py-1 font-bold rounded-t">
+              {{ day.date }}
+            </p>
+
+            <div class="flex justify-between items-center my-2">
+              <img
+                class="rounded w-1/3"
+                :src="day.authorImageUrl"
+                :alt="day.authorName"
+              />
+
+              <a
+                class="block w-3/5 truncate text-blue-500 hover:text-blue-800"
+                :href="`https://qiita.com/${day.authorName}`"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ day.authorName }}
+              </a>
+            </div>
+
+            <a v-if="day.articleUrl !== null"
+              :href="day.articleUrl"
+              class="text-blue-500 hover:text-blue-800"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ day.comment }}
+            </a>
+
+            <p v-else
+              class="text-gray-900"
+            >
+              {{ day.comment }}
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="my-2">
+      ※ このページはレスポンシブ対応していません。デスクトップサイズの画面でご覧ください。
+    </p>
   </div>
 </template>
 
-<style>
-/* Sample `apply` at-rules with Tailwind CSS
-.container {
-  @apply min-h-screen flex justify-center items-center text-center mx-auto;
+<script>
+import { parse } from 'node-html-parser'
+export default {
+  async asyncData({ $axios }) {
+    const { data } = await $axios.get('https://qiita.com/advent-calendar/2019/nuxt-js')
+    const root = parse(data)
+    return {
+      comment: root.querySelector('.markdownContent').text,
+      dayNames: root.querySelectorAll('.adventCalendarCalendar_dayName').map(dayName => dayName.text),
+      days: root.querySelectorAll('.adventCalendarCalendar_day').map(day => {
+        const articleUrl = day.querySelector('.adventCalendarCalendar_comment').querySelector('a') ?
+          day.querySelector('.adventCalendarCalendar_comment').querySelector('a').attributes['href'] :
+          null
+        return {
+          date: day.querySelector('.adventCalendarCalendar_date').text,
+          authorName: day.querySelector('.adventCalendarCalendar_author').text.replace(/\s|&nbsp;/g, ''),
+          authorImageUrl: day.querySelector('.adventCalendarCalendar_authorIcon').attributes['src'],
+          comment: day.querySelector('.adventCalendarCalendar_comment').text,
+          articleUrl: articleUrl
+        }
+      })
+    }
+  }
 }
-*/
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
+</script>
 
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+<style scoped>
+.day {
   display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+  width: calc(100% / 7);
 }
 </style>
