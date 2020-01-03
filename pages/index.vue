@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         <tr class="flex"
-          v-for="index in [0, 1, 2]"
+          v-for="index in [0, 1, 2, 3]"
           :key="index"
         >
           <td class="border px-4 py-2 day"
