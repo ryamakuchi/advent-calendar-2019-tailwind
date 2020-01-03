@@ -6,7 +6,7 @@
 
     <p class="mb-2">{{ comment }}</p>
 
-    <table class="table-auto w-full">
+    <table class="table-auto w-full border">
       <thead>
         <tr class="flex">
           <th class="border px-4 py-2 day"
@@ -62,6 +62,17 @@
               {{ day.comment }}
             </p>
           </td>
+
+          <template v-if="index == 3">
+            <td v-for="day in [26, 27, 28]"
+              :key="day"
+              class="border px-4 py-2 day"
+            >
+              <p class="bg-gray-100 text-gray-700 px-2 py-1 font-bold rounded-t">
+                {{ day }}
+              </p>
+            </td>
+          </template>
         </tr>
       </tbody>
     </table>
